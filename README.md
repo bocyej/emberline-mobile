@@ -3,10 +3,10 @@
 **Lead frozen villagers to the fire, then build a village that keeps them alive.**
 
 Emberline is a casual mobile game made for quick sessions and entry-level phones. In each short
-run you guide a growing line of frozen travellers across the ice to a campfire. The people you save
+run you guide a growing line of frozen travellers across the ice to the campfire in the middle. The people you save
 move into your village, where you build, upgrade and defend it, and keep the great hearth burning.
 
-Current version: **3.7.3** (see [CHANGELOG.md](CHANGELOG.md))
+Current version: **3.8.0** (see [CHANGELOG.md](CHANGELOG.md))
 
 <p>
   <img src="docs/screenshots/01-village.png" width="240" alt="The village with its great hearth and happy villagers">
@@ -20,7 +20,8 @@ Current version: **3.7.3** (see [CHANGELOG.md](CHANGELOG.md))
 
 ### Runs: save people from the cold
 - **Lead the line:** drag to steer. Every frozen traveller you touch joins your line, and the longer the line, the more each one is worth.
-- **Bank at a fire:** reaching a campfire banks the line and warms you up. Wait too long for a longer line and the cold catches you.
+- **Bank at the campfire:** it always sits in the middle. Reaching it banks the line and warms you up. Wait too long for a longer line and the cold catches you.
+- **A guide for new players:** the first time something appears (wolves, ice, torches, gold ice, the rainbow power), the game pauses, zooms in and names it in one line.
 - **Danger grows:** the run gets faster as it goes. Ice spikes block the way, and wolves go for your villagers first. Once a wolf catches the line, you lose one person every second until you reach a fire.
 - **Golden Aurora:** a rare power-up that smashes wolves and ice and pauses the cold.
 - **Instant replay:** every run ends with a replay of what went wrong.
@@ -55,10 +56,10 @@ when you do it well.
 
 | Where | Mini-game |
 |---|---|
-| Fishing dock | Keep the fish inside the green bar until the meter fills |
+| Fishing dock | Hold to keep the fish in the bar |
 | Hunter's lodge | Strike with your axe and dodge when the red ! flashes |
-| Ice well | Saw ice blocks along the line; strain never eases |
-| Workshop | Hammer the nails on the beat (rhythm game) |
+| Ice well | Saw slowly down the line |
+| Workshop | Hammer nails on the beat |
 | Lumber camp | Chop from left or right, switching sides to dodge branches |
 | Smokehouse | Tap the bellows to keep the heat in the green band |
 | Tailor | Tap the stitch marks in order to sew coats |
@@ -85,6 +86,7 @@ when you do it well.
 | <img src="docs/screenshots/08-raid.png" width="230"><br>A raid begins | <img src="docs/screenshots/08b-raid-fight.png" width="230"><br>Defending the gate | <img src="docs/screenshots/11-trouble.png" width="230"><br>Sickness spreading |
 | <img src="docs/screenshots/12-shop.png" width="230"><br>The shop | <img src="docs/screenshots/13-placing.png" width="230"><br>Placing a decoration | <img src="docs/screenshots/14-hearth-out.png" width="230"><br>Coming back to a cold hearth |
 | <img src="docs/screenshots/15-cold-village.png" width="230"><br>Freezing villagers | <img src="docs/screenshots/16-missions.png" width="230"><br>Missions | <img src="docs/screenshots/17-avatar.png" width="230"><br>Avatar |
+| <img src="docs/screenshots/18-guide.png" width="230"><br>The first-run guide | | |
 
 To retake these from the current build, run `node tools/build.js && node tools/readme-shots.js`.
 
@@ -96,6 +98,7 @@ The full history, with every fix, is in [CHANGELOG.md](CHANGELOG.md).
 
 | Version | Highlights |
 |---|---|
+| **3.8.0** | First-run guide that pauses and names each new thing; the campfire stays in the middle; much shorter instructions and event text. |
 | **3.7.3** | Infirmary cues: "Watch" and "Your turn" now show as big words that fade away. |
 | **3.7.2** | Stoking stays on screen on short phones; "Raid X" opening banner and a smaller enemy count; ice strain never eases. |
 | **3.7.1** | Thought bubbles sit on villagers' heads; gentler, individual shivering; fixed buildings sometimes drawn as black circles. |
@@ -128,6 +131,77 @@ The whole game is one file, `www/index.html`. The art, fonts, sound and code are
 Progress is saved in each browser on its own, so your phone and your computer each keep their own village.
 
 ---
+
+## For developers
+
+HTML5 canvas, no libraries, about 360 KB in total. Tuning lives in the constants at the top of
+`src/village.js` (T, ROLES, BUILD) and `src/sim.js` (C). The village never changes a run, so daily
+and challenge scores stay comparable.
+
+### Layout
+    src/sim.js     Rules. Pure, seeded, integer-only. Can run unchanged on a server.
+    src/village.js People, needs, buildings, missions, avatar rules. Pure; time is passed in.
+    src/mini.js    Mini-games for events and jobs.
+    src/iso.js     The 2.5D village: building art, camera, gestures, walkers.
+    src/meta.js    Building panel, overview, missions, chests and avatar screens.
+    src/store.js   Saves. Swap this file's internals to go online.
+    src/art.js     Paper cut-out art, painted once into sprites.
+    src/game.js    Input, drawing, sound, screens.
+    www/           The only folder that ships in the app.
+    docs/          README screenshots.
+
+### Commands
+    node tools/build.js        # writes dist/ and www/
+    node tools/test-sim.js     # run rule tests
+    node tools/test-village.js # village, needs, missions, avatar tests
+    node tools/economy.js      # weeks of village life with simulated players
+    node tools/balance.js      # difficulty, using simulated players
+    node tools/greed.js        # does waiting for a longer line pay?
+    node tools/readme-shots.js # retakes the README screenshots
+
+Browser tests (need Playwright):
+
+    node tools/smoke.js         # every run flow, phone-sized, CPU throttled
+    node tools/smoke-meta.js    # needs, missions, avatar, skipping days
+    node tools/smoke-iso.js     # 2.5D village, gestures, upgrades, chests
+    node tools/smoke-events.js  # events, jobs and every mini-game
+    node tools/smoke-mini.js    # villager movement; each mini-game played well and badly
+    node tools/smoke-place.js   # success scenes, raids ending, decorations, new land, wolves
+    node tools/raid-balance.js  # a bot plays raids at each stage, with and without upgrades
+    node tools/smoke-hearth.js  # cold hearth losses and relighting, troubles, raid jams and enemy kinds
+    node tools/smoke-mood.js    # thought bubbles and cold looks, raid-only shop, button spacing
+    node tools/smoke-games2.js  # stoking on short phones, ice strain, raid banner
+    node tools/smoke-guide.js   # first-run guide: pause, zoom and name each new thing, once
+    node tools/smoke-floor.js   # floors stay pixel-identical when someone walks behind a building
+
+### Versioning
+Every release gets a new number in `package.json` and an entry in `CHANGELOG.md`; the build stops
+without one. The build also refuses two functions with the same name in one file. `VERSION` in
+`src/sim.js` and the save version are separate: change those only when run rules or the save
+format change.
+
+### Android build (not run yet)
+    npm i @capacitor/core @capacitor/android && npm i -D @capacitor/cli
+    npx cap add android && npx cap sync android
+
+### iPhone build (not run yet)
+On a Mac with Xcode 26 or later and Node 22 or later:
+
+    npm i @capacitor/core @capacitor/ios && npm i -D @capacitor/cli
+    npx cap add ios && npx cap sync ios && npx cap open ios
+
+### Before release
+- Measure on a real entry-level phone. The numbers so far come from a throttled desktop browser.
+- Search Google Play and the App Store for the exact title; a web search is not proof it is free.
+- Create the upload key, back it up off this machine, enrol in Play App Signing.
+- Replace localStorage with @capacitor/preferences inside store.js: Android WebView can lose
+  localStorage written just before a hard kill, and iOS can clear web storage after long disuse.
+- Check phone text size at 1.15x and 1.3x.
+
+### Rule deliberately broken
+The mobile-game-dev playbook says to avoid animated full-screen canvases. A real-time game needs a
+moving layer, so the moving canvas covers only the board, the backdrop is one static image, every
+sprite is pre-painted, and quality drops automatically on slow phones.
 
 ## Credits
 Erica One and Bricolage Grotesque, SIL Open Font License (assets/fonts). All art and sound are

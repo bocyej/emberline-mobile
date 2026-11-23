@@ -8,6 +8,14 @@ Numbers follow MAJOR.MINOR.PATCH.
 
 Versions 1.0.0 to 3.5.0 were assigned afterwards, one for each round of work.
 
+## 3.8.0
+Fewer words, a guide for new players, and one campfire in the middle.
+- First-time guide: the first time something appears in a run, the game pauses, zooms in and names it in one line. It covers the campfire, frozen villagers, gold ice, ice spikes, wolves, torches, the rainbow power and the cold. Each tip shows once.
+- The campfire stays in the middle of the board instead of moving after each bank. Runs are a little easier, and old friend codes from 3.7 no longer match.
+- Every mini-game's instructions cut to one short line.
+- Village troubles, raid warnings, protection notes, run-end tips and village screens rewritten shorter.
+- Fixed: outdated tips that said a run relights the hearth. It is relit by stoking.
+
 ## 3.7.3
 - Infirmary remedy game: "Watch" and "Your turn" now appear as big words over a dimmed screen and fade away, like the instructions. Taps while "Your turn" is fading are ignored, not counted as mistakes. The timer is 7 seconds longer to make up for the pauses.
 
